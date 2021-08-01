@@ -3,27 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"math"
-	"strconv"
 
 	"github.com/karagulamos/filterable"
 )
 
 func main() {
-	max := flag.String("max", "1000", "e.g. primes -max 100")
+	max := flag.Int("max", 1000, "e.g. primes -max 1000")
 
 	flag.Parse()
 
-	limit, err := strconv.Atoi(*max)
-
-	if err != nil {
-		log.Panicln(err)
-		return
-	}
-
 	primes := filterable.
-		Range(2, limit).
+		Range(2, *max).
 		Where(func(value interface{}) bool {
 			number := float64(value.(int))
 			return filterable.
