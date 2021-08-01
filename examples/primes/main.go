@@ -19,6 +19,7 @@ func main() {
 
 	if err != nil {
 		log.Panicln(err)
+		return
 	}
 
 	primes := filterable.
