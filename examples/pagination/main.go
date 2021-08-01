@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	pageNumber, pageSize := 1, 20
+	pageNumber, pageSize := 3, 20
 
 	values := filterable.
 		Range(1, 100).
