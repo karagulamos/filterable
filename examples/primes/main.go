@@ -22,7 +22,7 @@ func main() {
 				All(func(divisor interface{}) bool {
 					return int(number)%divisor.(int) != 0
 				})
-		})
+		}).Unwrap()
 
-	fmt.Println(*primes)
+	fmt.Println(primes)
 }

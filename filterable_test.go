@@ -31,19 +31,19 @@ func Test_Filterable_New(t *testing.T) {
 		{
 			name:     "when a valid slice is given",
 			input:    sliceInput,
-			expected: format_expected(sliceInput),
+			expected: format_any(sliceInput),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when a valid array is given",
 			input:    arrayInput,
-			expected: format_expected(arrayInput[:]),
+			expected: format_any(arrayInput[:]),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
@@ -59,11 +59,11 @@ func Test_Filterable_New(t *testing.T) {
 		{
 			name:     "when an empty slice is given",
 			input:    emptyInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			error:    errInvalid,
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 	}
@@ -81,41 +81,41 @@ func Test_Filterable_Range(t *testing.T) {
 		{
 			name:     "when a zero count is given",
 			input:    &filterableRange{0, 0},
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				r := *input.(*filterableRange)
 				collection := Range(r.start, r.stop)
-				return format_any(collection), nil
+				return format_any(collection.Unwrap()), nil
 			},
 		},
 		{
 			name:     "when a negative count is given",
 			input:    &filterableRange{1, -7},
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				r := *input.(*filterableRange)
 				collection := Range(r.start, r.stop)
-				return format_any(collection), nil
+				return format_any(collection.Unwrap()), nil
 			},
 		},
 		{
 			name:     "when a valid range is given",
 			input:    &filterableRange{1, 7},
-			expected: format_expected(sliceInput),
+			expected: format_any(sliceInput),
 			action: func(input interface{}) (string, error) {
 				r := *input.(*filterableRange)
 				collection := Range(r.start, r.stop)
-				return format_any(collection), nil
+				return format_any(collection.Unwrap()), nil
 			},
 		},
 		{
 			name:     "when generating a negative range",
 			input:    &filterableRange{-3, 7},
-			expected: format_expected([]int{-3, -2, -1, 0, 1, 2, 3}),
+			expected: format_any([]int{-3, -2, -1, 0, 1, 2, 3}),
 			action: func(input interface{}) (string, error) {
 				r := *input.(*filterableRange)
 				collection := Range(r.start, r.stop)
-				return format_any(collection), nil
+				return format_any(collection.Unwrap()), nil
 			},
 		},
 	}
@@ -232,31 +232,31 @@ func Test_Filterable_Where(t *testing.T) {
 		{
 			name:     "when predicate is satisfied",
 			input:    sliceInput,
-			expected: format_expected([]int{1, 3, 5, 7}),
+			expected: format_any([]int{1, 3, 5, 7}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.Where(func(value interface{}) bool {
 					return value.(int)%2 == 1
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when an empty slice is given",
 			input:    emptyInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.Where(func(value interface{}) bool {
 					return true
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when chained",
 			input:    sliceInput,
-			expected: format_expected([]int{3, 5}),
+			expected: format_any([]int{3, 5}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 
@@ -269,7 +269,7 @@ func Test_Filterable_Where(t *testing.T) {
 						return value.(int)%2 == 1
 					})
 
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 	}
@@ -282,13 +282,13 @@ func Test_Filterable_WhereIndexed(t *testing.T) {
 		{
 			name:     "when indexed predicate is satisfied",
 			input:    sliceInput,
-			expected: format_expected([]int{1, 3, 5, 7}),
+			expected: format_any([]int{1, 3, 5, 7}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.WhereIndexed(func(idx int, value interface{}) bool {
 					return idx%2 == 0
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 	}
@@ -301,31 +301,31 @@ func Test_Filterable_Select(t *testing.T) {
 		{
 			name:     "when an empty slice is given",
 			input:    emptyInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.Select(func(value interface{}) interface{} {
 					return value
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when valid slice is given",
 			input:    sliceInput,
-			expected: format_expected([]int{2, 4, 6, 8, 10, 12, 14}),
+			expected: format_any([]int{2, 4, 6, 8, 10, 12, 14}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 				collection = collection.Select(func(value interface{}) interface{} {
 					return value.(int) * 2
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when chained",
 			input:    sliceInput,
-			expected: format_expected([]int{2, 6, 10, 14}),
+			expected: format_any([]int{2, 6, 10, 14}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 
@@ -337,13 +337,13 @@ func Test_Filterable_Select(t *testing.T) {
 						return value.(int) * 2
 					})
 
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when selector calls Empty() to ignore results",
 			input:    sliceInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 
@@ -351,7 +351,7 @@ func Test_Filterable_Select(t *testing.T) {
 					return Empty()
 				})
 
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 	}
@@ -364,13 +364,13 @@ func Test_Filterable_SelectIndexed(t *testing.T) {
 		{
 			name:     "when indexed selector is called",
 			input:    sliceInput,
-			expected: format_expected([]int{0, 1, 2, 3, 4, 5, 6}),
+			expected: format_any([]int{0, 1, 2, 3, 4, 5, 6}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 				collection = collection.SelectIndexed(func(idx int, value interface{}) interface{} {
 					return idx
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 	}
@@ -393,31 +393,31 @@ func Test_Filterable_Distinct(t *testing.T) {
 		{
 			name:     "when an empty slice is given",
 			input:    emptyInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				deduped := collection.Distinct()
-				return format_any(deduped), err
+				return format_any(deduped.Unwrap()), err
 			},
 		},
 		{
 			name:     "when slice contains duplicates",
 			input:    append(sliceInput, sliceInput...),
-			expected: format_expected(sliceInput),
+			expected: format_any(sliceInput),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				deduped := collection.Distinct()
-				return format_any(deduped), err
+				return format_any(deduped.Unwrap()), err
 			},
 		},
 		{
 			name:     "when deduping a complex type",
 			input:    scores,
-			expected: format_any(&[]gameScore{{"Alex", 20}, {"James", 20}}),
+			expected: format_any([]gameScore{{"Alex", 20}, {"James", 20}}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				deduped := collection.Distinct()
-				return format_any(deduped), err
+				return format_any(deduped.Unwrap()), err
 			},
 		},
 	}
@@ -440,13 +440,13 @@ func Test_Filterable_DistinctBy(t *testing.T) {
 		{
 			name:     "when deduping a complex type by key",
 			input:    scores,
-			expected: format_any(&[]gameScore{{"Alex", 20}, {"Alex", 30}}),
+			expected: format_any([]gameScore{{"Alex", 20}, {"Alex", 30}}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				deduped := collection.DistinctBy(func(value interface{}) interface{} {
 					return value.(gameScore).Score
 				})
-				return format_any(deduped), err
+				return format_any(deduped.Unwrap()), err
 			},
 		},
 	}
@@ -459,37 +459,37 @@ func Test_Filterable_Union(t *testing.T) {
 		{
 			name:     "when empty collections are given",
 			input:    Range(0, 0),
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				result := Range(0, 0).Union(input.(*filterable))
-				return format_any(result), nil
+				return format_any(result.Unwrap()), nil
 			},
 		},
 		{
 			name:     "when unioning one non-empty collection with an empty one",
 			input:    Range(1, 2),
-			expected: format_expected([]int{1, 2}),
+			expected: format_any([]int{1, 2}),
 			action: func(input interface{}) (string, error) {
 				result := input.(*filterable).Union(Range(0, 0))
-				return format_any(result), nil
+				return format_any(result.Unwrap()), nil
 			},
 		},
 		{
 			name:     "when unioning non-empty collections",
 			input:    Range(1, 2),
-			expected: format_expected([]int{1, 2, 3, 4}),
+			expected: format_any([]int{1, 2, 3, 4}),
 			action: func(input interface{}) (string, error) {
 				result := input.(*filterable).Union(Range(3, 2))
-				return format_any(result), nil
+				return format_any(result.Unwrap()), nil
 			},
 		},
 		{
 			name:     "when unioning dupplicates",
 			input:    Range(1, 2),
-			expected: format_expected([]int{1, 2}),
+			expected: format_any([]int{1, 2}),
 			action: func(input interface{}) (string, error) {
 				result := input.(*filterable).Union(Range(1, 2))
-				return format_any(result), nil
+				return format_any(result.Unwrap()), nil
 			},
 		},
 	}
@@ -502,39 +502,39 @@ func Test_Filterable_Intersect(t *testing.T) {
 		{
 			name:     "when empty collections are given",
 			input:    Range(0, 0),
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				result := Range(0, 0).Intersect(input.(*filterable))
-				return format_any(result), nil
+				return format_any(result.Unwrap()), nil
 			},
 		},
 		{
 			name:     "when finding intersect of collections with common values",
 			input:    Range(0, 7),
-			expected: format_expected([]int{0, 2, 3}),
+			expected: format_any([]int{0, 2, 3}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New([]int{3, 0, 2})
 				result := input.(*filterable).Intersect(collection)
-				return format_any(result), err
+				return format_any(result.Unwrap()), err
 			},
 		},
 		{
 			name:     "when finding intersect of collections with duplicates",
 			input:    []int{3, 0, 0, 2, 1, 2},
-			expected: format_expected([]int{3, 0, 2, 1}),
+			expected: format_any([]int{3, 0, 2, 1}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				result := collection.Intersect(Range(0, 7))
-				return format_any(result), err
+				return format_any(result.Unwrap()), err
 			},
 		},
 		{
 			name:     "when finding intersect of unique collections",
 			input:    Range(1, 5),
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				result := input.(*filterable).Intersect(Range(6, 5))
-				return format_any(result), nil
+				return format_any(result.Unwrap()), nil
 			},
 		},
 	}
@@ -547,49 +547,49 @@ func Test_Filterable_Except(t *testing.T) {
 		{
 			name:     "when empty collections are given",
 			input:    Range(0, 0),
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				result := Range(0, 0).Except(input.(*filterable))
-				return format_any(result), nil
+				return format_any(result.Unwrap()), nil
 			},
 		},
 		{
 			name:     "when some values in first collection don't exist in second",
 			input:    Range(0, 7),
-			expected: format_expected([]int{1, 4, 5, 6}),
+			expected: format_any([]int{1, 4, 5, 6}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New([]int{3, 0, 2})
 				result := input.(*filterable).Except(collection)
-				return format_any(result), err
+				return format_any(result.Unwrap()), err
 			},
 		},
 		{
 			name:     "when all values in first collection don't exist in second",
 			input:    Range(1, 5),
-			expected: format_expected([]int{1, 2, 3, 4, 5}),
+			expected: format_any([]int{1, 2, 3, 4, 5}),
 			action: func(input interface{}) (string, error) {
 				result := input.(*filterable).Except(Range(6, 5))
-				return format_any(result), nil
+				return format_any(result.Unwrap()), nil
 			},
 		},
 		{
 			name:     "when first collection contains duplicates of values in second",
 			input:    []int{3, 0, 0, 2, 1, 2},
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				result := collection.Except(Range(0, 7))
-				return format_any(result), err
+				return format_any(result.Unwrap()), err
 			},
 		},
 		{
 			name:     "when first collection contains duplicates of values not in second",
 			input:    []int{3, 0, 0, 2, 1, 2},
-			expected: format_expected([]int{3, 0, 2, 1}),
+			expected: format_any([]int{3, 0, 2, 1}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				result := collection.Except(Range(4, 5))
-				return format_any(result), err
+				return format_any(result.Unwrap()), err
 			},
 		},
 	}
@@ -602,57 +602,57 @@ func Test_Filterable_Skip(t *testing.T) {
 		{
 			name:     "when an empty slice is given",
 			input:    emptyInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.Skip(skipCount)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when skip count is negative",
 			input:    sliceInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 				collection = collection.Skip(-skipCount)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when skip count is zero",
 			input:    sliceInput,
-			expected: format_expected(sliceInput),
+			expected: format_any(sliceInput),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 				collection = collection.Skip(0)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when valid slice is given",
 			input:    sliceInput,
-			expected: format_expected([]int{2, 3, 4, 5, 6, 7}),
+			expected: format_any([]int{2, 3, 4, 5, 6, 7}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 				collection = collection.Skip(skipCount)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when skip count greater than length of slice",
 			input:    sliceInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 				collection = collection.Skip(len(sliceInput) + 1)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when chained",
 			input:    sliceInput,
-			expected: format_expected([]int{5, 7}),
+			expected: format_any([]int{5, 7}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 				collection = collection.
@@ -662,7 +662,7 @@ func Test_Filterable_Skip(t *testing.T) {
 					}).
 					Skip(skipCount)
 
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 	}
@@ -675,57 +675,57 @@ func Test_Filterable_Take(t *testing.T) {
 		{
 			name:     "when an empty slice is given",
 			input:    emptyInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.Take(takeCount)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when take count is negative",
 			input:    sliceInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 				collection = collection.Take(-takeCount)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when take count is zero",
 			input:    sliceInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 				collection = collection.Take(0)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when valid slice is given",
 			input:    sliceInput,
-			expected: format_expected([]int{1}),
+			expected: format_any([]int{1}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 				collection = collection.Take(takeCount)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when take count greater than length of slice",
 			input:    sliceInput,
-			expected: format_expected(sliceInput),
+			expected: format_any(sliceInput),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.Take(len(sliceInput) + 1)
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when chained",
 			input:    sliceInput,
-			expected: format_expected([]int{3}),
+			expected: format_any([]int{3}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(sliceInput)
 				collection = collection.
@@ -735,7 +735,7 @@ func Test_Filterable_Take(t *testing.T) {
 					Skip(skipCount).
 					Take(takeCount)
 
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 	}
@@ -748,49 +748,49 @@ func Test_Filterable_TakeWhile(t *testing.T) {
 		{
 			name:     "when an empty slice is given",
 			input:    emptyInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.TakeWhile(func(_ interface{}) bool {
 					return true
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when a valid slice and predicate is given",
 			input:    sliceInput,
-			expected: format_expected([]int{1}),
+			expected: format_any([]int{1}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.TakeWhile(func(value interface{}) bool {
 					return value.(int)%2 == 1
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when a truthy predicate is given",
 			input:    sliceInput,
-			expected: format_expected(sliceInput),
+			expected: format_any(sliceInput),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.TakeWhile(func(value interface{}) bool {
 					return true
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when a falsy predicate is given",
 			input:    sliceInput,
-			expected: format_expected([]int{}),
+			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.TakeWhile(func(value interface{}) bool {
 					return false
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 	}
@@ -805,7 +805,7 @@ func Test_Filterable_TakeWhileIndexed(t *testing.T) {
 		"orange", "blueberry", "grape", "strawberry",
 	}
 
-	expected := &[]string{
+	expected := []string{
 		"apple", "passionfruit", "banana", "mango",
 		"orange", "blueberry",
 	}
@@ -820,7 +820,7 @@ func Test_Filterable_TakeWhileIndexed(t *testing.T) {
 				collection = collection.TakeWhileIndexed(func(index int, fruit interface{}) bool {
 					return len(fruit.(string)) >= index
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 	}
@@ -834,19 +834,19 @@ func Test_Filterable_SkipWhile(t *testing.T) {
 		"orange", "blueberry", "grape", "strawberry",
 	}
 
-	expected := &[]string{"grape", "strawberry"}
+	expected := []string{"grape", "strawberry"}
 
 	scenarios := []testScenario{
 		{
 			name:     "when an empty slice is given",
 			input:    []string{},
-			expected: format_any(&[]string{}),
+			expected: format_any([]string{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.SkipWhile(func(fruit interface{}) bool {
 					return fruit.(string) != "grape"
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
@@ -858,31 +858,31 @@ func Test_Filterable_SkipWhile(t *testing.T) {
 				collection = collection.SkipWhile(func(fruit interface{}) bool {
 					return fruit.(string) != "grape"
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when a truthy predicate is given",
 			input:    fruits,
-			expected: format_any(&[]string{}),
+			expected: format_any([]string{}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.SkipWhile(func(fruit interface{}) bool {
 					return true
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 		{
 			name:     "when a falsy predicate is given",
 			input:    fruits,
-			expected: format_any(&fruits),
+			expected: format_any(fruits),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.SkipWhile(func(fruit interface{}) bool {
 					return false
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 	}
@@ -903,22 +903,18 @@ func Test_Filterable_SkipWhileIndexed(t *testing.T) {
 		{
 			name:     "when a valid slice is given",
 			input:    amounts,
-			expected: format_expected(expected),
+			expected: format_any(expected),
 			action: func(input interface{}) (string, error) {
 				collection, err := New(input)
 				collection = collection.SkipWhileIndexed(func(index int, amount interface{}) bool {
 					return amount.(int) > index*1000
 				})
-				return format_any(collection), err
+				return format_any(collection.Unwrap()), err
 			},
 		},
 	}
 
 	run_tests_on("SkipWhileIndexed", scenarios, t)
-}
-
-func format_expected(input []int) string {
-	return fmt.Sprintf("%v", &input)
 }
 
 func format_any(collection interface{}) string {

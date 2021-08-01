@@ -51,6 +51,10 @@ func Range(start int, count int) *filterable {
 	return collection
 }
 
+func (items *filterable) Unwrap() filterable {
+	return *items
+}
+
 func (items *filterable) Where(predicate func(interface{}) bool) *filterable {
 	return items.WhereIndexed(func(_ int, key interface{}) bool {
 		return predicate(key)

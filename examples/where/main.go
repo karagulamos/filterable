@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/karagulamos/filterable"
@@ -13,11 +14,12 @@ func main() {
 
 	if err != nil {
 		log.Fatalln(err)
+		return
 	}
 
 	collection = collection.Where(func(value interface{}) bool {
 		return value.(int)%2 == 1
 	})
 
-	log.Println(*collection...)
+	fmt.Println(collection.Unwrap())
 }
