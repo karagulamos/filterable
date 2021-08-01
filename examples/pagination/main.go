@@ -12,7 +12,8 @@ func main() {
 	values := filterable.
 		Range(1, 100).
 		Skip((pageNumber - 1) * pageSize).
-		Take(pageSize)
+		Take(pageSize).
+		Unwrap()
 
-	fmt.Println(*values)
+	fmt.Println(values)
 }
