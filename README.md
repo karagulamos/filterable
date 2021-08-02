@@ -1,6 +1,6 @@
 # Description
 
-## Filterable is an eager implementation of .NET's LINQ functions.
+## Filterable is an eager implementation of .NET's LINQ functions in Go.
 
 ## TODO
 - Better documentation
