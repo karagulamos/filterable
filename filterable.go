@@ -243,3 +243,37 @@ func (items *filterable) FirstWhere(predicate func(interface{}) bool) interface{
 		return !predicate(value)
 	}).First()
 }
+
+func (items *filterable) Last() interface{} {
+	if items, size := *items, len(*items); size > 0 {
+		return items[size-1]
+	}
+
+	return nil
+}
+
+func (items *filterable) LastWhere(predicate func(interface{}) bool) interface{} {
+	for items, idx := *items, len(*items)-1; idx >= 0; idx-- {
+		if predicate(items[idx]) {
+			return items[idx]
+		}
+	}
+
+	return nil
+}
+
+func (items *filterable) Count() int {
+	return len(*items)
+}
+
+func (items *filterable) CountWhere(predicate func(interface{}) bool) interface{} {
+	count := 0
+
+	for items, idx, size := *items, 0, len(*items); idx < size; idx++ {
+		if predicate(items[idx]) {
+			count++
+		}
+	}
+
+	return count
+}

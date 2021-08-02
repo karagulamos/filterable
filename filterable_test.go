@@ -1011,6 +1011,194 @@ func Test_Filterable_FirstWhere(t *testing.T) {
 	run_tests_on("FirstWhere", scenarios, t)
 }
 
+func Test_Filterable_Last(t *testing.T) {
+	scenarios := []testScenario{
+		{
+			name:     "when an empty slice is given",
+			input:    emptyInput,
+			expected: format_any(nil),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.Last()
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when a valid slice is given",
+			input:    sliceInput,
+			expected: format_any(7),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.Last()
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when chained",
+			input:    sliceInput,
+			expected: format_any(6),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.Where(func(value interface{}) bool {
+					return value.(int)%2 == 0
+				}).Last()
+				return format_any(item), err
+			},
+		},
+	}
+
+	run_tests_on("Last", scenarios, t)
+}
+
+func Test_Filterable_LastWhere(t *testing.T) {
+	scenarios := []testScenario{
+		{
+			name:     "when an empty slice is given",
+			input:    emptyInput,
+			expected: format_any(nil),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.LastWhere(func(i interface{}) bool {
+					return true
+				})
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when a valid slice is given",
+			input:    sliceInput,
+			expected: format_any(6),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.LastWhere(func(value interface{}) bool {
+					return value.(int)%2 == 0
+				})
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when a truthy predicate is given",
+			input:    sliceInput,
+			expected: format_any(7),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.LastWhere(func(value interface{}) bool {
+					return true
+				})
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when a falsy predicate is given",
+			input:    sliceInput,
+			expected: format_any(nil),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.LastWhere(func(value interface{}) bool {
+					return false
+				})
+				return format_any(item), err
+			},
+		},
+	}
+
+	run_tests_on("LastWhere", scenarios, t)
+}
+
+func Test_Filterable_Count(t *testing.T) {
+	scenarios := []testScenario{
+		{
+			name:     "when an empty slice is given",
+			input:    emptyInput,
+			expected: format_any(0),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.Count()
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when a valid slice is given",
+			input:    sliceInput,
+			expected: format_any(7),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.Count()
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when chained",
+			input:    sliceInput,
+			expected: format_any(3),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.Where(func(value interface{}) bool {
+					return value.(int)%2 == 0
+				}).Count()
+				return format_any(item), err
+			},
+		},
+	}
+
+	run_tests_on("Count", scenarios, t)
+}
+
+func Test_Filterable_CountWhere(t *testing.T) {
+	scenarios := []testScenario{
+		{
+			name:     "when an empty slice is given",
+			input:    emptyInput,
+			expected: format_any(0),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.CountWhere(func(value interface{}) bool {
+					return value.(int)%2 == 0
+				})
+				return format_any(result), err
+			},
+		},
+		{
+			name:     "when a valid slice is given",
+			input:    sliceInput,
+			expected: format_any(3),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.CountWhere(func(value interface{}) bool {
+					return value.(int)%2 == 0
+				})
+				return format_any(result), err
+			},
+		},
+		{
+			name:     "when a truthy predicate is given",
+			input:    sliceInput,
+			expected: format_any(7),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.CountWhere(func(value interface{}) bool {
+					return true
+				})
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when a falsy predicate is given",
+			input:    sliceInput,
+			expected: format_any(0),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.CountWhere(func(value interface{}) bool {
+					return false
+				})
+				return format_any(item), err
+			},
+		},
+	}
+
+	run_tests_on("CountWhere", scenarios, t)
+}
+
 func format_any(collection interface{}) string {
 	return fmt.Sprintf("%v", collection)
 }
