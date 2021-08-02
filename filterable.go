@@ -172,8 +172,8 @@ func (items *filterable) Except(collection *filterable) *filterable {
 }
 
 func (items *filterable) Skip(count int) *filterable {
-	if size := len(*items); count >= 0 && size > count {
-		projection := (*items)[count:]
+	if items := *items; count >= 0 && len(items) > count {
+		projection := items[count:]
 		return &projection
 	}
 
@@ -228,4 +228,18 @@ func (items *filterable) TakeWhileIndexed(predicate func(int, interface{}) bool)
 	}
 
 	return &projection
+}
+
+func (items *filterable) First() interface{} {
+	if items := *items; len(items) > 0 {
+		return items[0]
+	}
+
+	return nil
+}
+
+func (items *filterable) FirstWhere(predicate func(interface{}) bool) interface{} {
+	return items.SkipWhile(func(value interface{}) bool {
+		return !predicate(value)
+	}).First()
 }

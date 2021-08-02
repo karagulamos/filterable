@@ -917,6 +917,100 @@ func Test_Filterable_SkipWhileIndexed(t *testing.T) {
 	run_tests_on("SkipWhileIndexed", scenarios, t)
 }
 
+func Test_Filterable_First(t *testing.T) {
+	scenarios := []testScenario{
+		{
+			name:     "when an empty slice is given",
+			input:    emptyInput,
+			expected: format_any(nil),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.First()
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when a valid slice is given",
+			input:    sliceInput,
+			expected: format_any(1),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.First()
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when chained",
+			input:    sliceInput,
+			expected: format_any(2),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.Where(func(value interface{}) bool {
+					return value.(int)%2 == 0
+				}).First()
+				return format_any(item), err
+			},
+		},
+	}
+
+	run_tests_on("First", scenarios, t)
+}
+
+func Test_Filterable_FirstWhere(t *testing.T) {
+	scenarios := []testScenario{
+		{
+			name:     "when an empty slice is given",
+			input:    emptyInput,
+			expected: format_any(nil),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.FirstWhere(func(i interface{}) bool {
+					return true
+				})
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when a valid slice is given",
+			input:    sliceInput,
+			expected: format_any(2),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.FirstWhere(func(value interface{}) bool {
+					return value.(int)%2 == 0
+				})
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when a truthy predicate is given",
+			input:    sliceInput,
+			expected: format_any(1),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.FirstWhere(func(value interface{}) bool {
+					return true
+				})
+				return format_any(item), err
+			},
+		},
+		{
+			name:     "when a falsy predicate is given",
+			input:    sliceInput,
+			expected: format_any(nil),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				item := collection.FirstWhere(func(value interface{}) bool {
+					return false
+				})
+				return format_any(item), err
+			},
+		},
+	}
+
+	run_tests_on("FirstWhere", scenarios, t)
+}
+
 func format_any(collection interface{}) string {
 	return fmt.Sprintf("%v", collection)
 }
