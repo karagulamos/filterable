@@ -1199,6 +1199,226 @@ func Test_Filterable_CountWhere(t *testing.T) {
 	run_tests_on("CountWhere", scenarios, t)
 }
 
+func Test_Filterable_OrderBy(t *testing.T) {
+	sorted := []int{1, 2, 3, 4, 5}
+	reversed := []int{5, 4, 3, 2, 1}
+	random := []int{2, 1, 3, 5, 4}
+
+	type gameStats struct {
+		Name  string
+		Score int
+	}
+
+	stats := []gameStats{
+		{"James", 20}, {"Alex", 30}, {"Alex", 20}, {"James", 30},
+	}
+
+	scenarios := []testScenario{
+		{
+			name:     "when slice is already sorted in ascending",
+			input:    sorted,
+			expected: format_any(sorted),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.OrderBy(func(object interface{}) interface{} {
+					return object.(int)
+				})
+				return format_any(result.Unwrap()), err
+			},
+		},
+		{
+			name:     "when slice is sorted is already sorted in descending",
+			input:    reversed,
+			expected: format_any(sorted),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.OrderBy(func(object interface{}) interface{} {
+					return object
+				})
+				return format_any(result.Unwrap()), err
+			},
+		},
+		{
+			name:     "when input slice is random",
+			input:    random,
+			expected: format_any(sorted),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.OrderBy(func(object interface{}) interface{} {
+					return object
+				})
+				return format_any(result.Unwrap()), err
+			},
+		},
+		{
+			name:     "when sorting in by complex key",
+			input:    stats,
+			expected: format_any([]gameStats{{"James", 20}, {"Alex", 20}, {"Alex", 30}, {"James", 30}}),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.OrderBy(func(object interface{}) interface{} {
+					score := object.(gameStats)
+					return score.Score
+				})
+				return format_any(result.Unwrap()), err
+			},
+		},
+		{
+			name:     "when filtering an orderable slice",
+			input:    stats,
+			expected: format_any([]gameStats{{"James", 20}, {"James", 30}}),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.
+					OrderBy(func(object interface{}) interface{} {
+						score := object.(gameStats)
+						return score.Score
+					}).
+					AsFilterable().
+					Where(func(item interface{}) bool {
+						return item.(gameStats).Name == "James"
+					})
+				return format_any(result.Unwrap()), err
+			},
+		},
+	}
+
+	run_tests_on("OrderBy", scenarios, t)
+}
+
+func Test_Filterable_OrderByDescending(t *testing.T) {
+	sorted := []int{1, 2, 3, 4, 5}
+	reversed := []int{5, 4, 3, 2, 1}
+	random := []int{2, 1, 3, 5, 4}
+
+	type gameStats struct {
+		Name  string
+		Score int
+	}
+
+	stats := []gameStats{
+		{"James", 20}, {"Alex", 30}, {"Alex", 20}, {"James", 30},
+	}
+
+	scenarios := []testScenario{
+		{
+			name:     "when slice is already sorted in descending",
+			input:    reversed,
+			expected: format_any(reversed),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.OrderByDescending(func(object interface{}) interface{} {
+					return object.(int)
+				})
+				return format_any(result.Unwrap()), err
+			},
+		},
+		{
+			name:     "when slice is already sorted in ascending",
+			input:    sorted,
+			expected: format_any(reversed),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.OrderByDescending(func(object interface{}) interface{} {
+					return object
+				})
+				return format_any(result.Unwrap()), err
+			},
+		},
+		{
+			name:     "when input slice is random",
+			input:    random,
+			expected: format_any(reversed),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.OrderByDescending(func(object interface{}) interface{} {
+					return object
+				})
+				return format_any(result.Unwrap()), err
+			},
+		},
+		{
+			name:     "when sorting in by complex key",
+			input:    stats,
+			expected: format_any([]gameStats{{"Alex", 30}, {"James", 30}, {"James", 20}, {"Alex", 20}}),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.OrderByDescending(func(object interface{}) interface{} {
+					score := object.(gameStats)
+					return score.Score
+				})
+				return format_any(result.Unwrap()), err
+			},
+		},
+		{
+			name:     "when filtering an orderable slice",
+			input:    stats,
+			expected: format_any([]gameStats{{"James", 30}, {"James", 20}}),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.
+					OrderByDescending(func(object interface{}) interface{} {
+						score := object.(gameStats)
+						return score.Score
+					}).
+					AsFilterable().
+					Where(func(item interface{}) bool {
+						return item.(gameStats).Name == "James"
+					})
+				return format_any(result.Unwrap()), err
+			},
+		},
+	}
+
+	run_tests_on("OrderByDescending", scenarios, t)
+}
+
+func Test_Filterable_Order(t *testing.T) {
+	sorted := []int{1, 2, 3, 4, 5}
+	reversed := []int{5, 4, 3, 2, 1}
+
+	scenarios := []testScenario{
+		{
+			name:     "when sorting slice in ascending",
+			input:    reversed,
+			expected: format_any(sorted),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.Order("asc", func(object interface{}) interface{} {
+					return object.(int)
+				})
+				return format_any(result.Unwrap()), err
+			},
+		},
+		{
+			name:     "when sorting slice in descending",
+			input:    sorted,
+			expected: format_any(reversed),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.Order("desc", func(object interface{}) interface{} {
+					return object
+				})
+				return format_any(result.Unwrap()), err
+			},
+		},
+		{
+			name:     "when invalid sort order is given",
+			input:    reversed,
+			expected: format_any(reversed),
+			action: func(input interface{}) (string, error) {
+				collection, err := New(input)
+				result := collection.Order("wrong", func(object interface{}) interface{} {
+					return object
+				})
+				return format_any(result.Unwrap()), err
+			},
+		},
+	}
+
+	run_tests_on("Order", scenarios, t)
+}
+
 func format_any(collection interface{}) string {
 	return fmt.Sprintf("%v", collection)
 }

@@ -3,9 +3,12 @@ package filterable
 import (
 	"fmt"
 	"reflect"
+	"sort"
+	"strings"
 )
 
 type filterable []interface{}
+type orderable filterable
 
 type emptyFilterableSelection struct{}
 
@@ -53,6 +56,14 @@ func Range(start int, count int) *filterable {
 
 func (items *filterable) Unwrap() filterable {
 	return *items
+}
+
+func (items *orderable) Unwrap() orderable {
+	return *items
+}
+
+func (items *orderable) AsFilterable() *filterable {
+	return (*filterable)(items)
 }
 
 func (items *filterable) Where(predicate func(interface{}) bool) *filterable {
@@ -276,4 +287,37 @@ func (items *filterable) CountWhere(predicate func(interface{}) bool) interface{
 	}
 
 	return count
+}
+
+func (items *filterable) OrderBy(selector func(object interface{}) interface{}) *orderable {
+	sort.SliceStable(*items, func(i, j int) bool {
+		first := fmt.Sprintf("%v", selector((*items)[i]))
+		second := fmt.Sprintf("%v", selector((*items)[j]))
+
+		return first < second
+	})
+
+	return (*orderable)(items)
+}
+
+func (items *filterable) OrderByDescending(selector func(object interface{}) interface{}) *orderable {
+	sort.SliceStable(*items, func(i, j int) bool {
+		first := fmt.Sprintf("%v", selector((*items)[i]))
+		second := fmt.Sprintf("%v", selector((*items)[j]))
+
+		return first > second
+	})
+
+	return (*orderable)(items)
+}
+
+func (items *filterable) Order(sortOrder string, selector func(object interface{}) interface{}) *orderable {
+	switch strings.ToLower(sortOrder) {
+	case "asc":
+		return items.OrderBy(selector)
+	case "desc":
+		return items.OrderByDescending(selector)
+	default:
+		return (*orderable)(items)
+	}
 }
