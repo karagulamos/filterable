@@ -66,6 +66,13 @@ func (items *orderable) AsFilterable() *filterable {
 	return (*filterable)(items)
 }
 
+func (items *filterable) AsOrderable() *orderable {
+	orderable := orderable{}
+
+	orderable = append(orderable, *items...)
+	return &orderable
+}
+
 func (items *filterable) Where(predicate func(interface{}) bool) *filterable {
 	return items.WhereIndexed(func(_ int, key interface{}) bool {
 		return predicate(key)
@@ -290,25 +297,29 @@ func (items *filterable) CountWhere(predicate func(interface{}) bool) interface{
 }
 
 func (items *filterable) OrderBy(selector func(object interface{}) interface{}) *orderable {
-	sort.SliceStable(*items, func(i, j int) bool {
-		first := fmt.Sprintf("%v", selector((*items)[i]))
-		second := fmt.Sprintf("%v", selector((*items)[j]))
+	values := *items.AsOrderable()
+
+	sort.SliceStable(values, func(i, j int) bool {
+		first := fmt.Sprintf("%v", selector(values[i]))
+		second := fmt.Sprintf("%v", selector(values[j]))
 
 		return first < second
 	})
 
-	return (*orderable)(items)
+	return &values
 }
 
 func (items *filterable) OrderByDescending(selector func(object interface{}) interface{}) *orderable {
-	sort.SliceStable(*items, func(i, j int) bool {
-		first := fmt.Sprintf("%v", selector((*items)[i]))
-		second := fmt.Sprintf("%v", selector((*items)[j]))
+	values := *items.AsOrderable()
+
+	sort.SliceStable(values, func(i, j int) bool {
+		first := fmt.Sprintf("%v", selector(values[i]))
+		second := fmt.Sprintf("%v", selector(values[j]))
 
 		return first > second
 	})
 
-	return (*orderable)(items)
+	return &values
 }
 
 func (items *filterable) Order(sortOrder string, selector func(object interface{}) interface{}) *orderable {

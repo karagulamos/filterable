@@ -1203,6 +1203,7 @@ func Test_Filterable_OrderBy(t *testing.T) {
 	sorted := []int{1, 2, 3, 4, 5}
 	reversed := []int{5, 4, 3, 2, 1}
 	random := []int{2, 1, 3, 5, 4}
+	untampered, _ := New(reversed)
 
 	type gameStats struct {
 		Name  string
@@ -1281,6 +1282,18 @@ func Test_Filterable_OrderBy(t *testing.T) {
 				return format_any(result.Unwrap()), err
 			},
 		},
+		{
+			name:     "when verifying original slice is unchanged",
+			input:    untampered,
+			expected: format_any(untampered.Unwrap()),
+			action: func(input interface{}) (string, error) {
+				collection := input.(*filterable)
+				collection.OrderBy(func(object interface{}) interface{} {
+					return object
+				})
+				return format_any(collection.Unwrap()), nil
+			},
+		},
 	}
 
 	run_tests_on("OrderBy", scenarios, t)
@@ -1290,6 +1303,7 @@ func Test_Filterable_OrderByDescending(t *testing.T) {
 	sorted := []int{1, 2, 3, 4, 5}
 	reversed := []int{5, 4, 3, 2, 1}
 	random := []int{2, 1, 3, 5, 4}
+	untampered := Range(1, 10)
 
 	type gameStats struct {
 		Name  string
@@ -1366,6 +1380,18 @@ func Test_Filterable_OrderByDescending(t *testing.T) {
 						return item.(gameStats).Name == "James"
 					})
 				return format_any(result.Unwrap()), err
+			},
+		},
+		{
+			name:     "when verifying original slice is unchanged",
+			input:    untampered,
+			expected: format_any(untampered.Unwrap()),
+			action: func(input interface{}) (string, error) {
+				collection := input.(*filterable)
+				collection.OrderByDescending(func(object interface{}) interface{} {
+					return object
+				})
+				return format_any(collection.Unwrap()), nil
 			},
 		},
 	}
