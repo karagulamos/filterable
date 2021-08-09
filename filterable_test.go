@@ -461,7 +461,7 @@ func Test_Filterable_Union(t *testing.T) {
 			input:    Range(0, 0),
 			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
-				result := Range(0, 0).Union(input.(*filterable))
+				result := Range(0, 0).Union(input.(*Filterable))
 				return format_any(result.Unwrap()), nil
 			},
 		},
@@ -470,7 +470,7 @@ func Test_Filterable_Union(t *testing.T) {
 			input:    Range(1, 2),
 			expected: format_any([]int{1, 2}),
 			action: func(input interface{}) (string, error) {
-				result := input.(*filterable).Union(Range(0, 0))
+				result := input.(*Filterable).Union(Range(0, 0))
 				return format_any(result.Unwrap()), nil
 			},
 		},
@@ -479,7 +479,7 @@ func Test_Filterable_Union(t *testing.T) {
 			input:    Range(1, 2),
 			expected: format_any([]int{1, 2, 3, 4}),
 			action: func(input interface{}) (string, error) {
-				result := input.(*filterable).Union(Range(3, 2))
+				result := input.(*Filterable).Union(Range(3, 2))
 				return format_any(result.Unwrap()), nil
 			},
 		},
@@ -488,7 +488,7 @@ func Test_Filterable_Union(t *testing.T) {
 			input:    Range(1, 2),
 			expected: format_any([]int{1, 2}),
 			action: func(input interface{}) (string, error) {
-				result := input.(*filterable).Union(Range(1, 2))
+				result := input.(*Filterable).Union(Range(1, 2))
 				return format_any(result.Unwrap()), nil
 			},
 		},
@@ -504,7 +504,7 @@ func Test_Filterable_Intersect(t *testing.T) {
 			input:    Range(0, 0),
 			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
-				result := Range(0, 0).Intersect(input.(*filterable))
+				result := Range(0, 0).Intersect(input.(*Filterable))
 				return format_any(result.Unwrap()), nil
 			},
 		},
@@ -514,7 +514,7 @@ func Test_Filterable_Intersect(t *testing.T) {
 			expected: format_any([]int{0, 2, 3}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New([]int{3, 0, 2})
-				result := input.(*filterable).Intersect(collection)
+				result := input.(*Filterable).Intersect(collection)
 				return format_any(result.Unwrap()), err
 			},
 		},
@@ -533,7 +533,7 @@ func Test_Filterable_Intersect(t *testing.T) {
 			input:    Range(1, 5),
 			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
-				result := input.(*filterable).Intersect(Range(6, 5))
+				result := input.(*Filterable).Intersect(Range(6, 5))
 				return format_any(result.Unwrap()), nil
 			},
 		},
@@ -549,7 +549,7 @@ func Test_Filterable_Except(t *testing.T) {
 			input:    Range(0, 0),
 			expected: format_any([]int{}),
 			action: func(input interface{}) (string, error) {
-				result := Range(0, 0).Except(input.(*filterable))
+				result := Range(0, 0).Except(input.(*Filterable))
 				return format_any(result.Unwrap()), nil
 			},
 		},
@@ -559,7 +559,7 @@ func Test_Filterable_Except(t *testing.T) {
 			expected: format_any([]int{1, 4, 5, 6}),
 			action: func(input interface{}) (string, error) {
 				collection, err := New([]int{3, 0, 2})
-				result := input.(*filterable).Except(collection)
+				result := input.(*Filterable).Except(collection)
 				return format_any(result.Unwrap()), err
 			},
 		},
@@ -568,7 +568,7 @@ func Test_Filterable_Except(t *testing.T) {
 			input:    Range(1, 5),
 			expected: format_any([]int{1, 2, 3, 4, 5}),
 			action: func(input interface{}) (string, error) {
-				result := input.(*filterable).Except(Range(6, 5))
+				result := input.(*Filterable).Except(Range(6, 5))
 				return format_any(result.Unwrap()), nil
 			},
 		},
@@ -1287,7 +1287,7 @@ func Test_Filterable_OrderBy(t *testing.T) {
 			input:    untampered,
 			expected: format_any(untampered.Unwrap()),
 			action: func(input interface{}) (string, error) {
-				collection := input.(*filterable)
+				collection := input.(*Filterable)
 				collection.OrderBy(func(object interface{}) interface{} {
 					return object
 				})
@@ -1387,7 +1387,7 @@ func Test_Filterable_OrderByDescending(t *testing.T) {
 			input:    untampered,
 			expected: format_any(untampered.Unwrap()),
 			action: func(input interface{}) (string, error) {
-				collection := input.(*filterable)
+				collection := input.(*Filterable)
 				collection.OrderByDescending(func(object interface{}) interface{} {
 					return object
 				})

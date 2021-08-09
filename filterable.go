@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-type filterable []interface{}
-type orderable filterable
+type Filterable []interface{}
+type orderable Filterable
 
 type emptyFilterableSelection struct{}
 
@@ -16,7 +16,7 @@ var (
 	empty = &emptyFilterableSelection{}
 )
 
-func New(slice interface{}) (*filterable, error) {
+func New(slice interface{}) (*Filterable, error) {
 	s := reflect.ValueOf(slice)
 
 	if s.Kind() != reflect.Slice && s.Kind() != reflect.Array {
@@ -25,7 +25,7 @@ func New(slice interface{}) (*filterable, error) {
 
 	size := s.Len()
 
-	filterable := make(filterable, size)
+	filterable := make(Filterable, size)
 
 	for idx := 0; idx < size; idx++ {
 		filterable[idx] = s.Index(idx).Interface()
@@ -38,9 +38,9 @@ func Empty() *emptyFilterableSelection {
 	return empty
 }
 
-func Range(start int, count int) *filterable {
+func Range(start int, count int) *Filterable {
 	if count <= 0 {
-		return &filterable{}
+		return &Filterable{}
 	}
 
 	values, stop, idx := make([]int, count), start+count, 0
@@ -54,7 +54,7 @@ func Range(start int, count int) *filterable {
 	return collection
 }
 
-func (items *filterable) Unwrap() filterable {
+func (items *Filterable) Unwrap() Filterable {
 	return *items
 }
 
@@ -62,25 +62,25 @@ func (items *orderable) Unwrap() orderable {
 	return *items
 }
 
-func (items *orderable) AsFilterable() *filterable {
-	return (*filterable)(items)
+func (items *orderable) AsFilterable() *Filterable {
+	return (*Filterable)(items)
 }
 
-func (items *filterable) AsOrderable() *orderable {
+func (items *Filterable) AsOrderable() *orderable {
 	orderable := orderable{}
 
 	orderable = append(orderable, *items...)
 	return &orderable
 }
 
-func (items *filterable) Where(predicate func(interface{}) bool) *filterable {
+func (items *Filterable) Where(predicate func(interface{}) bool) *Filterable {
 	return items.WhereIndexed(func(_ int, key interface{}) bool {
 		return predicate(key)
 	})
 }
 
-func (items *filterable) WhereIndexed(predicate func(int, interface{}) bool) *filterable {
-	projection := filterable{}
+func (items *Filterable) WhereIndexed(predicate func(int, interface{}) bool) *Filterable {
+	projection := Filterable{}
 
 	for index, item := range *items {
 		if predicate(index, item) {
@@ -91,7 +91,7 @@ func (items *filterable) WhereIndexed(predicate func(int, interface{}) bool) *fi
 	return &projection
 }
 
-func (items *filterable) Any(predicate func(interface{}) bool) bool {
+func (items *Filterable) Any(predicate func(interface{}) bool) bool {
 	for _, item := range *items {
 		if predicate(item) {
 			return true
@@ -101,20 +101,20 @@ func (items *filterable) Any(predicate func(interface{}) bool) bool {
 	return false
 }
 
-func (items *filterable) All(predicate func(interface{}) bool) bool {
+func (items *Filterable) All(predicate func(interface{}) bool) bool {
 	return !items.Any(func(value interface{}) bool {
 		return !predicate(value)
 	})
 }
 
-func (items *filterable) Select(keySelector func(interface{}) interface{}) *filterable {
+func (items *Filterable) Select(keySelector func(interface{}) interface{}) *Filterable {
 	return items.SelectIndexed(func(_ int, value interface{}) interface{} {
 		return keySelector(value)
 	})
 }
 
-func (items *filterable) SelectIndexed(keySelector func(int, interface{}) interface{}) *filterable {
-	projection := filterable{}
+func (items *Filterable) SelectIndexed(keySelector func(int, interface{}) interface{}) *Filterable {
+	projection := Filterable{}
 
 	for index, item := range *items {
 		if key := keySelector(index, item); key != empty {
@@ -125,16 +125,16 @@ func (items *filterable) SelectIndexed(keySelector func(int, interface{}) interf
 	return &projection
 }
 
-func (items *filterable) Distinct() *filterable {
+func (items *Filterable) Distinct() *Filterable {
 	return items.DistinctBy(func(value interface{}) interface{} {
 		return value
 	})
 }
 
-func (items *filterable) DistinctBy(keySelector func(interface{}) interface{}) *filterable {
+func (items *Filterable) DistinctBy(keySelector func(interface{}) interface{}) *Filterable {
 	set := map[interface{}]bool{}
 
-	deduped := filterable{}
+	deduped := Filterable{}
 
 	for _, item := range *items {
 		key := keySelector(item)
@@ -148,19 +148,19 @@ func (items *filterable) DistinctBy(keySelector func(interface{}) interface{}) *
 	return &deduped
 }
 
-func (items *filterable) Union(collection *filterable) *filterable {
+func (items *Filterable) Union(collection *Filterable) *Filterable {
 	projection := append(*items, *collection...)
 	return (&projection).Distinct()
 }
 
-func (items *filterable) Intersect(collection *filterable) *filterable {
+func (items *Filterable) Intersect(collection *Filterable) *Filterable {
 	second := map[interface{}]bool{}
 
 	for _, item := range *collection {
 		second[item] = true
 	}
 
-	intersection := filterable{}
+	intersection := Filterable{}
 
 	for _, item := range *items {
 		if _, exist := second[item]; exist {
@@ -171,14 +171,14 @@ func (items *filterable) Intersect(collection *filterable) *filterable {
 	return (&intersection).Distinct()
 }
 
-func (items *filterable) Except(collection *filterable) *filterable {
+func (items *Filterable) Except(collection *Filterable) *Filterable {
 	second := map[interface{}]bool{}
 
 	for _, item := range *collection {
 		second[item] = true
 	}
 
-	projection := filterable{}
+	projection := Filterable{}
 
 	for _, item := range *items {
 		if _, exist := second[item]; !exist {
@@ -189,22 +189,22 @@ func (items *filterable) Except(collection *filterable) *filterable {
 	return (&projection).Distinct()
 }
 
-func (items *filterable) Skip(count int) *filterable {
+func (items *Filterable) Skip(count int) *Filterable {
 	if items := *items; count >= 0 && len(items) > count {
 		projection := items[count:]
 		return &projection
 	}
 
-	return &filterable{}
+	return &Filterable{}
 }
 
-func (items *filterable) SkipWhile(predicate func(interface{}) bool) *filterable {
+func (items *Filterable) SkipWhile(predicate func(interface{}) bool) *Filterable {
 	return items.SkipWhileIndexed(func(_ int, value interface{}) bool {
 		return predicate(value)
 	})
 }
 
-func (items *filterable) SkipWhileIndexed(predicate func(int, interface{}) bool) *filterable {
+func (items *Filterable) SkipWhileIndexed(predicate func(int, interface{}) bool) *Filterable {
 	index, size := 0, len(*items)
 
 	for index < size && predicate(index, (*items)[index]) {
@@ -212,16 +212,16 @@ func (items *filterable) SkipWhileIndexed(predicate func(int, interface{}) bool)
 	}
 
 	if index >= size {
-		return &filterable{}
+		return &Filterable{}
 	}
 
 	projection := (*items)[index:]
 	return &projection
 }
 
-func (items *filterable) Take(count int) *filterable {
+func (items *Filterable) Take(count int) *Filterable {
 	if count <= 0 {
-		return &filterable{}
+		return &Filterable{}
 	}
 
 	if items := *items; count > 0 && count < len(items) {
@@ -232,14 +232,14 @@ func (items *filterable) Take(count int) *filterable {
 	return items
 }
 
-func (items *filterable) TakeWhile(predicate func(interface{}) bool) *filterable {
+func (items *Filterable) TakeWhile(predicate func(interface{}) bool) *Filterable {
 	return items.TakeWhileIndexed(func(_ int, value interface{}) bool {
 		return predicate(value)
 	})
 }
 
-func (items *filterable) TakeWhileIndexed(predicate func(int, interface{}) bool) *filterable {
-	projection := filterable{}
+func (items *Filterable) TakeWhileIndexed(predicate func(int, interface{}) bool) *Filterable {
+	projection := Filterable{}
 
 	for idx := 0; idx < len(*items) && predicate(idx, (*items)[idx]); idx++ {
 		projection = append(projection, (*items)[idx])
@@ -248,7 +248,7 @@ func (items *filterable) TakeWhileIndexed(predicate func(int, interface{}) bool)
 	return &projection
 }
 
-func (items *filterable) First() interface{} {
+func (items *Filterable) First() interface{} {
 	if items := *items; len(items) > 0 {
 		return items[0]
 	}
@@ -256,13 +256,13 @@ func (items *filterable) First() interface{} {
 	return nil
 }
 
-func (items *filterable) FirstWhere(predicate func(interface{}) bool) interface{} {
+func (items *Filterable) FirstWhere(predicate func(interface{}) bool) interface{} {
 	return items.SkipWhile(func(value interface{}) bool {
 		return !predicate(value)
 	}).First()
 }
 
-func (items *filterable) Last() interface{} {
+func (items *Filterable) Last() interface{} {
 	if items, size := *items, len(*items); size > 0 {
 		return items[size-1]
 	}
@@ -270,7 +270,7 @@ func (items *filterable) Last() interface{} {
 	return nil
 }
 
-func (items *filterable) LastWhere(predicate func(interface{}) bool) interface{} {
+func (items *Filterable) LastWhere(predicate func(interface{}) bool) interface{} {
 	for items, idx := *items, len(*items)-1; idx >= 0; idx-- {
 		if predicate(items[idx]) {
 			return items[idx]
@@ -280,11 +280,11 @@ func (items *filterable) LastWhere(predicate func(interface{}) bool) interface{}
 	return nil
 }
 
-func (items *filterable) Count() int {
+func (items *Filterable) Count() int {
 	return len(*items)
 }
 
-func (items *filterable) CountWhere(predicate func(interface{}) bool) interface{} {
+func (items *Filterable) CountWhere(predicate func(interface{}) bool) interface{} {
 	count := 0
 
 	for items, idx, size := *items, 0, len(*items); idx < size; idx++ {
@@ -296,7 +296,7 @@ func (items *filterable) CountWhere(predicate func(interface{}) bool) interface{
 	return count
 }
 
-func (items *filterable) OrderBy(selector func(object interface{}) interface{}) *orderable {
+func (items *Filterable) OrderBy(selector func(object interface{}) interface{}) *orderable {
 	values := *items.AsOrderable()
 
 	sort.SliceStable(values, func(i, j int) bool {
@@ -309,7 +309,7 @@ func (items *filterable) OrderBy(selector func(object interface{}) interface{}) 
 	return &values
 }
 
-func (items *filterable) OrderByDescending(selector func(object interface{}) interface{}) *orderable {
+func (items *Filterable) OrderByDescending(selector func(object interface{}) interface{}) *orderable {
 	values := *items.AsOrderable()
 
 	sort.SliceStable(values, func(i, j int) bool {
@@ -322,7 +322,7 @@ func (items *filterable) OrderByDescending(selector func(object interface{}) int
 	return &values
 }
 
-func (items *filterable) Order(sortOrder string, selector func(object interface{}) interface{}) *orderable {
+func (items *Filterable) Order(sortOrder string, selector func(object interface{}) interface{}) *orderable {
 	switch strings.ToLower(sortOrder) {
 	case "asc":
 		return items.OrderBy(selector)
