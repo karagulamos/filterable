@@ -39,19 +39,19 @@ func Empty() *emptyFilterableSelection {
 }
 
 func Range(start int, count int) *Filterable {
+	filterable := Filterable{}
+
 	if count <= 0 {
-		return &Filterable{}
+		return &filterable
 	}
 
-	values, stop, idx := make([]int, count), start+count, 0
+	stop := start + count
 
 	for value := start; value < stop; value++ {
-		values[idx] = value
-		idx++
+		filterable = append(filterable, value)
 	}
 
-	collection, _ := New(values)
-	return collection
+	return &filterable
 }
 
 func (items *Filterable) Unwrap() Filterable {
