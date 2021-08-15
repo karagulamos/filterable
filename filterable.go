@@ -284,7 +284,7 @@ func (items *Filterable) Count() int {
 	return len(*items)
 }
 
-func (items *Filterable) CountWhere(predicate func(interface{}) bool) interface{} {
+func (items *Filterable) CountWhere(predicate func(interface{}) bool) int {
 	count := 0
 
 	for items, idx, size := *items, 0, len(*items); idx < size; idx++ {
